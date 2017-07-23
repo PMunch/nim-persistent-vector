@@ -144,7 +144,7 @@ proc delete*[T](vec: PersistentVector[T]): PersistentVector[T] {.noSideEffect.} 
   ## Returns a new persistent vector with the last element of the given vector missing.
   new result
   result.size = vec.size - 1
-  if vec.tail.len > 1:
+  if vec.tail.len > 1 or vec.tree == nil:
     result.shifts = vec.shifts
     result.tree = vec.tree
     result.tail = vec.tail[0 .. ^2]
