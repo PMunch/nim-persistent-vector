@@ -166,10 +166,9 @@ proc delete*[T](vec: PersistentVector[T]): PersistentVector[T] {.noSideEffect.} 
         result.shifts = vec.shifts - BITS
       else:
         result.shifts = vec.shifts
-        var vector = result
-        proc promoteRight[T](node: VectorNode[T]): VectorNode[T] =
+        proc promoteRight[T](vector: PersistentVector[T], node: VectorNode[T]): VectorNode[T] =
           if node.kind == branch:
-            let newNode = promoteRight(node.children[node.children.high])
+            let newNode = promoteRight(vector, node.children[node.children.high])
             if newNode == nil and node.children.len == 1:
               return nil
             result = VectorNode[T](kind: branch, children: node.children[0 .. ^2])
@@ -178,7 +177,7 @@ proc delete*[T](vec: PersistentVector[T]): PersistentVector[T] {.noSideEffect.} 
           else:
             vector.tail = copyRef(node.data)
             result = nil
-        result.tree = promoteRight(vec.tree)
+        result.tree = promoteRight(result, vec.tree)
 
 proc toPersistentVector*[T](s: seq[T]): PersistentVector[T] =
   ## Returns a new persistent vector that contains all elements in the passed sequence. This copies all the data from the sequence.
