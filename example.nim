@@ -2,7 +2,7 @@
 ## persistent vector data structure. It was created to test the algorithms
 ## during the implementation
 
-import vector
+import persvector
 
 # Create an empty vector of ints and a sequence of vectors
 var vec = initVector[int]()
