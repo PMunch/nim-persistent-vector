@@ -271,9 +271,13 @@ func high*[T](vec: PersistentVector[T]): int =
   return vec.size - 1
 
 func `$`*[T](vec: PersistentVector[T]): string =
-  ## Returns a string representation of the elements in the persistent vector. Equal to `$vec[0 .. ^1]`
-  #return if vec.tree == nil: "nil" else: ($vec.shifts & " " & $vec.tree)
-  return $vec[0 .. vec.high]
+  ## Returns a string representation of the elements in the persistent vector.
+  result = "PersistentVector["
+  for idx, x in vec:
+    result &= $x
+    if idx != vec.high:
+      result &= ", "
+  result &= "]"
 
 func `$`*(node: VectorNode): string =
   ## Returns a string representation of a vector node, for debugging.
