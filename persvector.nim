@@ -182,7 +182,7 @@ func delete*[T](vec: PersistentVector[T]): PersistentVector[T] =
 func toPersistentVector*[T](s: seq[T]): PersistentVector[T] =
   ## Returns a new persistent vector that contains all elements in the passed sequence. This copies all the data from the sequence.
   result = PersistentVector[T](size: s.len)
-  var nodes: seq[VectorNode[T]] = newSeq[VectorNode[T]](s.len shr BITS)
+  var nodes = newSeq[VectorNode[T]](s.len shr BITS)
   result.tail = s[s.len - (s.len and MASK) .. ^1]
   for i in 0..nodes.high:
     nodes[i] = VectorNode[T](kind: leaf, data: s[WIDTH*i .. WIDTH*(i+1)-1])
@@ -219,9 +219,8 @@ func `[]`*[T](vec: PersistentVector[T], slice: Slice[int]): seq[T] {.inline.} =
   elif slice.a >= vec.size - vec.tail.len:
     return vec.tail[slice.a - (vec.size - vec.tail.len) .. slice.b - (vec.size - vec.tail.len)]
   else:
-    var
-      i = slice.a
-      e = min(slice.b, vec.size - vec.tail.len - 1)
+    var i = slice.a
+    let e = min(slice.b, vec.size - vec.tail.len - 1)
     result = newSeq[T](slice.b - slice.a + 1)
     while i <= e:
       var
@@ -264,7 +263,7 @@ func len*[T](vec: PersistentVector[T]): int =
 
 func high*[T](vec: PersistentVector[T]): int =
   ## Function to get the highest valid index of the persistent vector
-  return vec.size-1
+  return vec.size - 1
 
 func `$`*[T](vec: PersistentVector[T]): string =
   ## Returns a string representation of the elements in the persistent vector. Equal to `$vec[0 .. ^1]`
