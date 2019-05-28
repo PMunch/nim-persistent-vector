@@ -239,7 +239,7 @@ func `[]`*[T](vec: PersistentVector[T], slice: Slice[int]): seq[T] {.inline.} =
     if i <= slice.b:
       result[i-slice.a .. slice.b-slice.a] =  vec.tail[i - (vec.size - vec.tail.len) .. slice.b - (vec.size - vec.tail.len)]
 
-iterator items*[T](vec: PersistentVector[T]): T {.noSideEffect.} =
+iterator pairs*[T](vec: PersistentVector[T]): tuple[key: int, val: T] {.noSideEffect.} =
   ## Optimised iterator for PersistentVector (could be optimised further)
   var i = 0
   if vec.tree != nil:
@@ -251,11 +251,16 @@ iterator items*[T](vec: PersistentVector[T]): T {.noSideEffect.} =
         let index = (i shr level) and MASK
         node = node.children[index]
         level -= BITS
-      for d in node.data:
-        yield d
+      for j, d in node.data:
+        yield (key: i + j, val: d)
       i += WIDTH
-  for d in vec.tail:
-    yield d
+  for j, d in vec.tail:
+    yield (key: i + j, val: d)
+
+iterator items*[T](vec: PersistentVector[T]): T {.noSideEffect.} =
+  ## Optimised iterator for PersistentVector (could be optimised further)
+  for idx, val in vec:
+    yield val
 
 func len*[T](vec: PersistentVector[T]): int =
   ## Function to get length of a persistent vector (stored result, not calculated)
