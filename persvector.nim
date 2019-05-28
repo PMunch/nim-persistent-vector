@@ -214,14 +214,16 @@ proc `[]`*[T](vec: PersistentVector[T], key: int): T {.inline, noSideEffect.} =
 
 proc `[]`*[T](vec: PersistentVector[T], slice: Slice[int]): seq[T] {.inline, noSideEffect.} =
   ## Optimised slice operator for persistent vectors, returns a sequence
-  if slice.a >= vec.size - vec.tail.len:
+  if slice.a == slice.b:
+    return @[vec[slice.a]]
+  elif slice.a >= vec.size - vec.tail.len:
     return vec.tail[slice.a - (vec.size - vec.tail.len) .. slice.b - (vec.size - vec.tail.len)]
   else:
     var
       i = slice.a
-      e = min(slice.b, vec.size - vec.tail.len)
+      e = min(slice.b, vec.size - vec.tail.len - 1)
     result = newSeq[T](slice.b - slice.a + 1)
-    while i < e:
+    while i <= e:
       var
         level = vec.shifts
         node = vec.tree
