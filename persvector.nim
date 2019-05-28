@@ -39,15 +39,15 @@ type
     shifts: int
     tree: VectorNode[T]
 
-proc copyRef[T](theSeq: seq[T]): seq[T] {.noSideEffect.} =
+func copyRef[T](theSeq: seq[T]): seq[T] =
   shallowCopy(result, theSeq)
 
 
-proc initVector*[T](): PersistentVector[T] {.noSideEffect.} =
+func initVector*[T](): PersistentVector[T] =
   new result
   result.tail = @[]
 
-proc add*[T](vec: PersistentVector[T], elem: T): PersistentVector[T] {.noSideEffect.} =
+func add*[T](vec: PersistentVector[T], elem: T): PersistentVector[T] =
   ## Returns a new persistent vector with the element `elem` inserted at the end
   new result
   result.size = vec.size + 1
@@ -107,7 +107,7 @@ proc add*[T](vec: PersistentVector[T], elem: T): PersistentVector[T] {.noSideEff
 
     result.tail = @[elem]
 
-proc update*[T](vec: PersistentVector[T], key: int, elem: T): PersistentVector[T] {.noSideEffect.} =
+func update*[T](vec: PersistentVector[T], key: int, elem: T): PersistentVector[T] =
   ## Returns a new persistent vector with the element at `key` changed to `elem`
   new result
   result.size = vec.size
@@ -140,7 +140,7 @@ proc update*[T](vec: PersistentVector[T], key: int, elem: T): PersistentVector[T
         level -= BITS
       node.data[key and MASK] = elem
 
-proc delete*[T](vec: PersistentVector[T]): PersistentVector[T] {.noSideEffect.} =
+func delete*[T](vec: PersistentVector[T]): PersistentVector[T] =
   ## Returns a new persistent vector with the last element of the given vector missing.
   new result
   result.size = vec.size - 1
@@ -179,7 +179,7 @@ proc delete*[T](vec: PersistentVector[T]): PersistentVector[T] {.noSideEffect.} 
             result = nil
         result.tree = promoteRight(result, vec.tree)
 
-proc toPersistentVector*[T](s: seq[T]): PersistentVector[T] =
+func toPersistentVector*[T](s: seq[T]): PersistentVector[T] =
   ## Returns a new persistent vector that contains all elements in the passed sequence. This copies all the data from the sequence.
   result = PersistentVector[T](size: s.len)
   var nodes: seq[VectorNode[T]] = newSeq[VectorNode[T]](s.len shr BITS)
@@ -199,7 +199,7 @@ proc toPersistentVector*[T](s: seq[T]): PersistentVector[T] =
     result.shifts += BITS
     result.tree = VectorNode[T](kind: branch, children: nodes)
 
-proc `[]`*[T](vec: PersistentVector[T], key: int): T {.inline, noSideEffect.} =
+func `[]`*[T](vec: PersistentVector[T], key: int): T {.inline.} =
   ## Access operator for persistent vectors
   if key >= vec.size - vec.tail.len:
     return vec.tail[key - (vec.size - vec.tail.len)]
@@ -212,7 +212,7 @@ proc `[]`*[T](vec: PersistentVector[T], key: int): T {.inline, noSideEffect.} =
     level -= BITS
   return node.data[key and MASK]
 
-proc `[]`*[T](vec: PersistentVector[T], slice: Slice[int]): seq[T] {.inline, noSideEffect.} =
+func `[]`*[T](vec: PersistentVector[T], slice: Slice[int]): seq[T] {.inline.} =
   ## Optimised slice operator for persistent vectors, returns a sequence
   if slice.a == slice.b:
     return @[vec[slice.a]]
@@ -258,20 +258,20 @@ iterator items*[T](vec: PersistentVector[T]): T {.noSideEffect.} =
   for d in vec.tail:
     yield d
 
-proc len*[T](vec: PersistentVector[T]): int {.noSideEffect.} =
+func len*[T](vec: PersistentVector[T]): int =
   ## Function to get length of a persistent vector (stored result, not calculated)
   return vec.size
 
-proc high*[T](vec: PersistentVector[T]): int {.noSideEffect.} =
+func high*[T](vec: PersistentVector[T]): int =
   ## Function to get the highest valid index of the persistent vector
   return vec.size-1
 
-proc `$`*[T](vec: PersistentVector[T]): string {.noSideEffect.} =
+func `$`*[T](vec: PersistentVector[T]): string =
   ## Returns a string representation of the elements in the persistent vector. Equal to `$vec[0 .. ^1]`
   #return if vec.tree == nil: "nil" else: ($vec.shifts & " " & $vec.tree)
   return $vec[0 .. vec.high]
 
-proc `$`*(node: VectorNode): string {.noSideEffect.} =
+func `$`*(node: VectorNode): string =
   ## Returns a string representation of a vector node, for debugging.
   if node.kind == leaf:
     return "l" & $cast[int](node.data) & ": " & $node.data
