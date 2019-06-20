@@ -193,8 +193,9 @@ func toPersistentVector*[T](s: seq[T]): PersistentVector[T] =
       newNodes[j] = VectorNode[T](kind: branch, children: nodes[j*WIDTH .. WIDTH*(j+1)-1])
     newNodes[newNodes.high] = VectorNode[T](kind:branch, children: nodes[newNodes.high*WIDTH .. nodes.high])
     nodes = newNodes
-  if nodes.len == 1:
-    result.tree = nodes[0]
+  case nodes.len:
+  of 0: result.tree = nil
+  of 1: result.tree = nodes[0]
   else:
     result.shifts += BITS
     result.tree = VectorNode[T](kind: branch, children: nodes)
