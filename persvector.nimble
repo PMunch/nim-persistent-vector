@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.1.0"
+version       = "1.0.0"
 author        = "Peter Munch-Ellingsen"
 description   = "Implementation of Clojures persistent vector in Nim for easy immutable lists."
 license       = "MIT"
